@@ -1,1 +1,1 @@
-# dl-stock-prediction
+# ml-stock-prediction
