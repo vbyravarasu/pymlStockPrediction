@@ -3,6 +3,7 @@ import pandas as pd
 from statsmodels.tsa.stattools import adfuller
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
+import matplotlib.pyplot as plt
 
 class RegressOnePeriod(object):
     
@@ -21,26 +22,28 @@ class RegressOnePeriod(object):
         self.lo_freq_col = lo_freq_col
         self.hi_freq_col = hi_freq_col
 
-    def regress(self):
+    def regress(self, stock_cols_len=6):
         df = self.df.copy()
+        ret = df.copy()
         for col in df.columns:
             other_cols = [c for c in df.columns if c != col]
+            assert len(other_cols) == stock_cols_len - 1, (other_cols, df.columns)
             y = df[col]
             x = df[other_cols]
             reg = LinearRegression(fit_intercept=True) # if no intercept R2 can be negative, not true indication
             reg.fit(x, y)
             pred = reg.predict(x)
-            df['%s_regPred' % col] = pred
-            df['%s_regR2score' % col] = reg.score(x, y)
-            df['%s_mae' % col] = mean_absolute_error(y, pred)
+            ret['%s_regPred' % col] = pred
+            ret['%s_regR2score' % col] = reg.score(x, y)
+            ret['%s_mae' % col] = mean_absolute_error(y, pred)
             
             err = pred - y
             adf = adfuller(err, maxlag=1, regression='c', autolag=None)
-            df['%s_adfStat' % col] = adf[0]
+            ret['%s_adfStat' % col] = adf[0]
 
             for coef, other in zip(reg.coef_, other_cols):
-                df['weightOf_%s_for%s' % (other, col)] = coef
-        return df
+                ret['weightOf_%s_for%s' % (other, col)] = coef
+        return ret
 
 class RegressAllPeriod(object):
     
@@ -63,7 +66,7 @@ class RegressAllPeriod(object):
         
         for i in range(len(intervals) - 1):
             rt = RegressOnePeriod(df, intervals[i], intervals[i + 1], self.lo_freq_col, self.hi_freq_col)
-            ret = pd.concat([ret, rt.regression()], axis=0)
+            ret = pd.concat([ret, rt.regress()], axis=0)
         assert ret.shape[0] == df.shape[0]
         assert ret.index[0] == df.index[0]
         assert ret.index[-1] == df.index[-1]
@@ -93,7 +96,7 @@ class RegressAllSpan(object):
     
     def regress(self):
         for span in self.spans:
-            self.reg_dfs[span] = RegressAllPeriod(df, span, lo_freq_col, hi_freq_col).copy()
+            self.reg_dfs[span] = RegressAllPeriod(self.df, span, self.lo_freq_col, self.hi_freq_col).regress()
         return
     
     def regressFeature(self):

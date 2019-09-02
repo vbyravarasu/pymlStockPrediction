@@ -66,11 +66,11 @@ class FFD(object):
             _ = self.plotMinFFD(col)
         return
     
-    def checkFFD(self):
+    def checkFFD(self, ffd):
         for col in self.df.columns:
-            corr = np.corrcoef(self.df.loc[self.ffd.index, col], self.ffd[col])[0, 1]
+            corr = np.corrcoef(self.df.loc[ffd.index, col], ffd[col])[0, 1]
             print(corr)
-            adf = adfuller(self.ffd[col], maxlag=1, regression='c', autolag=None)
+            adf = adfuller(ffd[col], maxlag=1, regression='c', autolag=None)
             print(adf)
         return
     
