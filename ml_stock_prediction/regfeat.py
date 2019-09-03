@@ -42,7 +42,7 @@ class RegressOnePeriod(object):
             ret['%s_adfStat' % col] = adf[0]
 
             for coef, other in zip(reg.coef_, other_cols):
-                ret['weightOf_%s_for%s' % (other, col)] = coef
+                ret['weightOf_%s_for_%s' % (other, col)] = coef
         return ret
 
 class RegressAllPeriod(object):
@@ -100,15 +100,16 @@ class RegressAllSpan(object):
         return
     
     def regressFeature(self):
-        ret = pd.DataFrame(index=self.reg_dfs[0].index)
+        ret = pd.DataFrame(index=self.reg_dfs[self.spans[0]].index)
         for span in self.spans:
             df = self.reg_dfs[span].copy()
             subtitle = str(span)
-            cols = [c for c in ret.columns if 'regPred' in c]
+            cols = [c for c in df.columns if 'regPred' in c]
             subdf = df.loc[:, cols]
             for col in self.stock_cols:
                 subdf['%s_regScore' % col] = df['%s_adfStat' % col].abs() * df['%s_regR2score' % col] * np.exp(- df['%s_mae' % col])
             subdf.columns = ['%s_%d' % (c, span) for c in subdf.columns]
+            print(subdf.columns)
             ret = pd.concat([ret, subdf], axis=1)
 
         for s in self.stock_cols:
