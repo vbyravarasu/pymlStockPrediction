@@ -109,7 +109,6 @@ class RegressAllSpan(object):
             for col in self.stock_cols:
                 subdf['%s_regScore' % col] = df['%s_adfStat' % col].abs() * df['%s_regR2score' % col] * np.exp(- df['%s_mae' % col])
             subdf.columns = ['%s_%d' % (c, span) for c in subdf.columns]
-            print(subdf.columns)
             ret = pd.concat([ret, subdf], axis=1)
 
         for s in self.stock_cols:
