@@ -37,7 +37,7 @@ class TechnicalAnalysis(object):
         df[col] = (df[close_col] - mavg) / (n_std * mstd)
         if fillna:
             df[col] = df[col].replace([np.inf, -np.inf], np.nan).fillna(0)
-        df[col].hist(bins=30)
+        df[col].hist(bins=50)
         plt.title(col)
         plt.show()
         plt.close()
@@ -87,7 +87,7 @@ class TechnicalAnalysis(object):
         df[col] = 2 * emaup / (emaup + emadn) - 1
         if fillna:
             df[col] = df[col].replace([np.inf, -np.inf], np.nan).fillna(0)
-        df[col].hist(bins=30)
+        df[col].hist(bins=50)
         plt.title(col)
         plt.show()
         plt.close()
@@ -139,7 +139,7 @@ class TechnicalAnalysis(object):
         df.loc[df[col] >= hband, col2] = 1
         if fillna:
             df[col] = df[col].replace([np.inf, -np.inf], np.nan).fillna(0)
-        df[col].plot(figsize=(20, 6))
+        df[col].hist(bins=50)
         plt.title(col)
         plt.show()
         df[col2].hist(bins=50)
