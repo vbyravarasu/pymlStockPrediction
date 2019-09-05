@@ -1,4 +1,4 @@
-from itertools import combinations
+from itertools import combinations, product
 import matplotlib.pyplot as plt
 
 class Differentiator(object):
@@ -18,7 +18,7 @@ class Differentiator(object):
     def diff(df, cols, d=1):
         df = df.copy()
         for col in cols:
-            name = '%s_diff' % col
+            name = '%s_diff%d' % (col, d)
             df[name] = df[col].diff(d)
             df[[name, col]].plot(secondary_y=name)
             plt.show()
@@ -34,11 +34,19 @@ class Differentiator(object):
     def lessEwm(self, df, cols, periods=20, fillna=False):
         df = df.copy()
         for col in cols:
-            name = '%s_ewm' % col
-            df[name] = self.ema(df[col], periods, fillna)
-            name1 = '%s_less_ewm' % col
-            df[name1] = df[col] - df[name]
-            df[[name1, col]].plot(secondary_y=name1)
+            name1 = '%s_less_ewm%d' % (col, periods)
+            df[name] = df[col] - self.ema(df[col], periods, fillna)
+            df[[name, col]].plot(secondary_y=name)
+            plt.show()
+            plt.close()
+        return df
+    
+    def pairwiseLessEwm(self, df, cols, periods=20, fillna=False):
+        df = df.copy()
+        for col1, col2 in product(cols, cols):
+            name = '%s_less_%s_ewm%d' % (col1, col2, periods)
+            df[name] = df[col1] - self.ema(df[col2], periods, fillna)
+            df[[name, col1, col2]].plot(secondary_y=name)
             plt.show()
             plt.close()
         return df

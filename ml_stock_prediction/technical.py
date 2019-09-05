@@ -48,6 +48,18 @@ class TechnicalAnalysis(object):
         if fillna:
             return series.ewm(span=periods, min_periods=0).mean()
         return series.ewm(span=periods, min_periods=periods).mean()
+    
+    def ewmFeat(self, df, close_col, subtitle, n_period=60, fillna=False):
+        df = df.copy()
+        col = '%s_ema' % subtitle
+        df[col] = self.ema(df[close_col], n_period, fillna)
+        if fillna:
+            df[col] = df[col].replace([np.inf, -np.inf], np.nan).fillna(0)
+        df[col].hist(bins=30)
+        plt.title(col)
+        plt.show()
+        plt.close()
+        return df
 
     def rsiIndicator(self, df, close_col, subtitle, n_period=14, upper_thres=65, lower_thres=35, fillna=False):
         """Relative Strength Index (RSI) compares the magnitude of recent gains and losses over a specified 
