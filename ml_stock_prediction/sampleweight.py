@@ -5,20 +5,22 @@ import matplotlib.pyplot as plt
 
 class SampleWeight(object):
     
-    def __init__(self, central_feat):
+    def __init__(self, central_feat, verbose=0):
         assert isinstance(central_feat, pd.DataFrame)
         assert central_feat.shape[0] == 1, central_feat.shape
         self.central_feat = central_feat
+        self.verbose = verbose
         self.sc = QuantileTransformer()
     
     def weight(self, x_sub, central_feat, cols):
-        for c in cols:
-            s = x_sub[c] - central_feat[c].values[0]
-            s /= 1. + np.mean(x_sub[c])
-            x_sub[c].plot()
-            plt.axhline(central_feat[c].values[0])
-            plt.title(c)
-            plt.show()
+        if self.verbose:
+            for c in cols:
+                s = x_sub[c] - central_feat[c].values[0]
+                s /= 1. + np.mean(x_sub[c])
+                x_sub[c].plot()
+                plt.axhline(central_feat[c].values[0])
+                plt.title(c)
+                plt.show()
         
         diff = [abs(x_sub[c] - central_feat[c].values[0]) / (1. + np.mean(x_sub[c])) for c in cols]
 
@@ -45,3 +47,8 @@ class SampleWeight(object):
         
         weight = self.weight(x_sub_sc, central_feat_sc, cols) 
         return weight
+
+class SampleWeightSimpole(SampleWeight):
+    
+    def weight(self):
+        pass
