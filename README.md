@@ -1,4 +1,4 @@
-# pyml
+# pymlStockPrediction
 
 Copyright (c) 2020	Yuting Wen
 
